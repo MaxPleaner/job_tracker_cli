@@ -8,8 +8,10 @@ Tracks job applications. Written in Ruby.
 
 1. Clone repoc
 2. bundle install
-3. open console with `ruby app.rb console`
+3. To run the cli, enter `ruby app.rb console`
 4. run migrations by entering `migrate` to the console
+
+- To load all the code but not run the console, require the file as usual (`require_relative ./app.rb`)
 
 ## Usage
 

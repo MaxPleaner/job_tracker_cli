@@ -1,4 +1,3 @@
-require 'byebug'
 require 'awesome_print'
 require 'colored'
 require 'sqlite3'

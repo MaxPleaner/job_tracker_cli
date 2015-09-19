@@ -6,9 +6,9 @@ Tracks job applications. Written in Ruby.
 
 ## To run
 
-1. Clone repoc
+1. Clone repo
 
-2. bundle install
+2. `bundle install` (tested with Ruby 1.9.3 and 2.2.3)
 
 3. To run the cli, enter `ruby app.rb console`
 

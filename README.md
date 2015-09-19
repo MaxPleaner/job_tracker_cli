@@ -47,5 +47,5 @@ Methods:
 
 - add some sort of reminder system for when to follow up with companies
 
-- use a YAML database
+- use a human-readable storage format like YAML or JSON 
 

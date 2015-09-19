@@ -17,7 +17,9 @@ Tracks job applications. Written in Ruby.
 
 To call a method from the console, enter the method's name.
 
-If a method takes arguments, append them to the method call without quotes (i.e. `add_company some_company_name`)
+If a method takes arguments, append them to the method call without quotes
+
+(i.e. `add_company some_company_name`)
 
 Methods: 
 

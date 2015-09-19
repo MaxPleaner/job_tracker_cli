@@ -14,11 +14,13 @@ class Migrations < ActiveRecord::Migration
 	def up
 		create_table :companies do |t|
 			t.string :name
+			t.timestamps
 		end
 		create_table :events do |t|
 			t.integer :company_id
 			t.text :content
 			t.boolean :is_response, default: false
+			t.timestamps
 		end
 	end
 end
@@ -57,6 +59,7 @@ class App
 	def self.find_company(company_name="")
 		ap Company
 				.where("name LIKE ?", "%#{company_name}%")
+				.order(created_at: :desc)
 				.map(&:attributes)
 	end
 	def self.all_companies
@@ -75,10 +78,16 @@ class App
 		ap event.attributes
 	end
 	def self.company_events(company_name)
-		ap Company.find_by(name: company_name).events.map(&:attributes)
+		ap Company.find_by(name: company_name)
+			.events
+			.order(created_at: :desc)
+			.map(&:attributes)
 	end
 	def self.responses
-		ap Event.where(is_response: true).map(&:attributes)
+		ap Event
+			.where(is_response: true)
+			.order(created_at: :desc)
+			.map(&:attributes)
 	end
 end
 
@@ -91,7 +100,7 @@ if ARGV.shift == "console"
 			args = input.chomp.split(" ")
 			method = args.shift.to_sym
 			unless App.methods(false).include?(method)
-				puts "method not found (type help to see method)"
+				puts "method not found (type help to see methods)"
 				next
 			end
 			App.send(method, *args)

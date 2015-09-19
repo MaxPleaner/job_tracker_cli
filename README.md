@@ -24,10 +24,17 @@ If a method takes arguments, append them to the method call without quotes
 Methods: 
 
 - `quit` - exits the program
+
 - `help` - lists available methods
+
 - `add_company(company_name)` - creates a company record
+
 - `find_company(company_name)` - searches for matching companies. company_name can be a partial match, i.e. `find_company obrr` will match the company "Sobrr".
+
 - `all_companies` - lists all companies
+
 - `add_event(company_name)` - add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true. 
+
 - `company_events(company_name)` - lists events associated with the given company
+
 - `responses` - list all events which are responses from companies

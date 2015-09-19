@@ -12,7 +12,7 @@ Tracks job applications. Written in Ruby.
 
 3. To run the cli, enter `ruby app.rb console`
 
-- To load all the code but not run the console, require the file as usual (`require_relative ./app.rb`)
+- To load all the code but not run the console, require the file as usual (`require_relative './app.rb'`)
 
 4. run migrations by entering `migrate` to the console
 

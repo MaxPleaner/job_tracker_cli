@@ -127,7 +127,7 @@ when "console"
 			puts error, error.backtrace
 			if error.class == ActiveRecord::StatementInvalid
 				puts "Active Record error - did you run the migrations?".yellow
-				puts "Do so by typing migrate".yellow
+				puts "Do so by typing migrate or remigrate".yellow
 			end
 			puts "error".red
 		end

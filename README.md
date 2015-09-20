@@ -16,6 +16,8 @@ Tracks job applications. Written in Ruby.
 
 - To load all the code but not run the console, require the file as usual (`require_relative './app.rb'`)
 
+- You can load the app and drop into byebug (if installed) by entering `ruby app.rb byebug`
+
 
 ## Usage
 
@@ -26,6 +28,10 @@ If a method takes arguments, append them to the method call without quotes
 (i.e. `add_company some_company_name`)
 
 Methods: 
+
+- `migrate` - run the migrations
+
+- `remigrate` - drop tables and run migrations again
 
 - `quit` - exits the program
 

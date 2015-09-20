@@ -13,14 +13,18 @@ class Migrations < ActiveRecord::Migration
 	def up
 		create_table :companies do |t|
 			t.string :name
-			t.timestamps
+			t.timestamps null: false
 		end
 		create_table :events do |t|
 			t.integer :company_id
 			t.text :content
 			t.boolean :is_response, default: false
-			t.timestamps
+			t.timestamps null: false
 		end
+	end
+	def down
+		drop_table :companies
+		drop_table :events
 	end
 end
 
@@ -41,6 +45,10 @@ class App
 	def self.migrate
 		Migrations.migrate(:up)
 	end
+	def self.remigrate
+		Migrations.migrate(:down)
+		Migrations.migrate(:up)
+	end
 	def self.quit
 		exit
 	end
@@ -51,6 +59,8 @@ class App
 		company = Company.create(name: company_name)
 		if company.valid?
 			ap(company.attributes)
+			puts "create an event for this company? (y for yes)"
+			add_event(company_name) if gets.chomp.downcase == "y" 
 		else
 			fail(StandardError, company.errors.full_messages)
 		end
@@ -66,7 +76,7 @@ class App
 		# when called without args, find_company lists all
 	end
 	def self.add_event(company_name)
-		puts "enter content (control d to end input)".yellow
+		puts "enter content (to end input, type enter then control+d )".yellow
 		content = $stdin.readlines.join
 		puts "is the event a response from the company? Type 'y' for yes".yellow
 		is_response = (gets.chomp.downcase == "y")
@@ -90,7 +100,16 @@ class App
 	end
 end
 
-if ARGV.shift == "console"
+
+case ARGV.shift # needs to be shifted, otherwise it interferes with gets
+when "byebug"
+	require 'byebug'
+	byebug
+	true
+when "console"
+	puts "Job Application Tracker".bold
+	puts "to see commands, type help"
+	puts "to exit, type quit"
 	while true
 		begin
 			print "> "
@@ -103,9 +122,13 @@ if ARGV.shift == "console"
 				next
 			end
 			App.send(method, *args)
-			puts "success".green
+			puts "ok".green
 		rescue StandardError => error
 			puts error, error.backtrace
+			if error.class == ActiveRecord::StatementInvalid
+				puts "Active Record error - did you run the migrations?".yellow
+				puts "Do so by typing migrate".yellow
+			end
 			puts "error".red
 		end
 	end

@@ -34,6 +34,12 @@ Companies
 `add_company(company_name)`: creates a company record
 `find_company(company_name)`: searches for matching companies. company_name can be a partial match, i.e. `find_company obrr` will match the company "Sobrr".
 `all_companies`: list all companies
+`responded_companies`: list companies which have responded
+`non_responded_companies`: list companies which have not responded
+`responded_percentage`: list percentage of companies which have responded
+`rejected_percentage`: list percentage of companies which have rejected
+`mark_rejected(company_name)`: mark a company as rejected
+`mark_responded(company_name)`: mark a company as responded
 
 Events
 `add_event(company_name)`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
@@ -52,6 +58,7 @@ Database
 
 ## TODO (fork please)
 
-- add reminder system for when to follow up with companies
-- add web interface with CRUD forms
-- hack the mainframe
+- Use many migrations instead of just one
+- Add reminder system for when to follow up with companies
+- Add web interface with CRUD forms
+- Hack the mainframe

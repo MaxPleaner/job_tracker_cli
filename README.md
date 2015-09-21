@@ -65,7 +65,7 @@ If a method takes arguments, append them to the method call without quotes
 `scheduled_events`: list all events with :is_scheduled as true. I.e. homework (coding challenges), scheduled interviews or phone screens. 
 
 `mark_unscheduled(event_id)`: set :is_scheduled to false. For example, when a scheduled phone screen has already happened.
- 
+
 **Application Counts**
 
 `last_day_applied_count`: num companies added in last 24 hours
@@ -87,5 +87,6 @@ If a method takes arguments, append them to the method call without quotes
 - Refactor app.rb into different files
 - Use many migrations instead of just one
 - Add reminder system for when to follow up with companies
+- API (JSON)
 - Add web interface with CRUD forms
 - Hack the mainframe

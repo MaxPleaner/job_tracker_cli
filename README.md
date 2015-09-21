@@ -28,32 +28,51 @@ If a method takes arguments, append them to the method call without quotes
 (i.e. `add_company some_company_name`)
 
 `help`: lists available methods
+
 `quit`: exits the program
 
-Companies 
+**Companies** 
+
 `add_company(company_name)`: creates a company record
+
 `find_company(company_name)`: searches for matching companies. company_name can be a partial match, i.e. `find_company obrr` will match the company "Sobrr".
+
 `all_companies`: list all companies
+
 `responded_companies`: list companies which have responded
+
 `non_responded_companies`: list companies which have not responded
+
 `responded_percentage`: list percentage of companies which have responded
+
 `rejected_percentage`: list percentage of companies which have rejected
+
 `mark_rejected(company_name)`: mark a company as rejected
+
 `mark_responded(company_name)`: mark a company as responded
 
-Events
+**Events**
+
 `add_event(company_name)`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
+
 `company_events(company_name)`: lists events associated with the given company
+
 `responses`: list all events which are responses from companies
 
-Application Counts
+**Application Counts**
+
 `last_day_applied_count`: num companies added in last 24 hours
+
 `total_applied_count`: total number of companies
+
 `responded_percentage`: percentage of companies which have responded
+
 `rejected_perecentage`: percentage of companies which have rejected
 
-Database
+**Database**
+
 `migrate`: run the migrations
+
 `remigrate`: drop tables and run migrations again
 
 ## TODO (fork please)

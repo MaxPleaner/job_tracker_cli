@@ -29,6 +29,8 @@ If a method takes arguments, append them to the method call without quotes
 
 `help`: lists available methods
 
+`readme`: print the readme
+
 `quit`: exits the program
 
 **Companies** 
@@ -52,6 +54,7 @@ If a method takes arguments, append them to the method call without quotes
 `mark_responded(company_name)`: mark a company as responded
 
 `pending_responded_companies`: companies which have responded but not rejected
+
 
 
 **Events**

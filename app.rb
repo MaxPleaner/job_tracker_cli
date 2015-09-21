@@ -47,6 +47,9 @@ class Event < ActiveRecord::Base
 end
 
 class App
+  def self.readme
+    puts File.read('./README.md')
+  end
   def self.migrate
     Migrations.migrate(:up)
   end
@@ -221,3 +224,4 @@ when "console"
   end
 end
 
+lists

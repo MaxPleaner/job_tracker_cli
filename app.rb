@@ -15,6 +15,8 @@ class Migrations < ActiveRecord::Migration
 	def up
 		create_table :companies do |t|
 			t.string :name
+			t.boolean :rejected, default: false
+			t.boolean :responded, default: false
 			t.timestamps null: false
 		end
 		create_table :events do |t|
@@ -86,6 +88,52 @@ class App
 		find_company
 		# when called without args, find_company lists all
 	end
+	def self.rejected_companies
+		ap Company
+		.where(rejected: true)
+		.order(created_at: :asc)
+		.map(&:attributes)
+	end
+	def self.non_rejected_companies
+		ap Company
+			.where(rejected: false)
+			.order(created_at: :asc)
+			.map(&:attributes)
+	end
+	def self.responded_companies
+		ap Company
+			.where(responded: true)
+			.order(created_at: :asc)
+			.map(&:attributes)
+	end
+	def self.non_responded_companies
+		ap Company
+			.where(responded: false)
+			.order(created_at: :asc)
+			.map(&:attributes)
+	end
+	def self.responded_percentage
+		ap ((
+			Company.where(responded: true).order(created_at: :asc).count.to_f /
+			Company.count.to_f
+		) * 100).round(2).to_s + "%"
+	end
+	def self.rejected_percentage
+		ap ((
+			Company.where(rejected: true).order(created_at: :asc).count.to_f /
+			Company.count.to_f
+		) * 100).round(2).to_s + "%"
+	end
+	def self.mark_rejected(company_name)
+		company = Company.find_by(name: company_name)
+		raise CompanyNotFoundError unless company
+		company.update(rejected: true)
+	end
+	def self.mark_responded(company_name)
+		company = Company.find_by(name: company_name)
+		raise CompanyNotFoundError unless company
+		company.update(responded: true)
+	end
 	def self.add_event(company_name)
 		puts "enter content (to end input, type enter then control+d )".yellow
 		content = $stdin.readlines.join
@@ -98,10 +146,9 @@ class App
 		ap event.attributes
 	end
 	def self.company_events(company_name)
-		ap Company.find_by(name: company_name)
-			.events
-			.order(created_at: :asc)
-			.map(&:attributes)
+		company = Company.find_by(name: company_name)
+		raise CompanyNotFoundError unless company
+		ap company.events.order(created_at: :asc).map(&:attributes)
 	end
 	def self.responses
 		ap Event
@@ -119,6 +166,8 @@ class App
 	end
 end
 
+class CompanyNotFoundError < StandardError
+end
 
 case ARGV.shift # needs to be shifted, otherwise it interferes with gets
 when "byebug"
@@ -142,6 +191,8 @@ when "console"
 			end
 			App.send(method, *args)
 			puts "ok".green
+		rescue CompanyNotFoundError => error
+			puts "company not found".yellow
 		rescue StandardError => error
 			puts error, error.backtrace
 			if error.message.scan(/table.+already\sexists/)
@@ -156,3 +207,4 @@ when "console"
 		end
 	end
 end
+

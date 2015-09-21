@@ -43,6 +43,8 @@ Events
 Application Counts
 `last_day_applied_count`: num companies added in last 24 hours
 `total_applied_count`: total number of companies
+`responded_percentage`: percentage of companies which have responded
+`rejected_perecentage`: percentage of companies which have rejected
 
 Database
 `migrate`: run the migrations

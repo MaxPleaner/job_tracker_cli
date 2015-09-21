@@ -35,7 +35,7 @@ If a method takes arguments, append them to the method call without quotes
 
 `add_company(company_name)`: creates a company record
 
-`find_company(company_name)`: searches for matching companies. company_name can be a partial match, i.e. `find_company obrr` will match the company "Sobrr".
+`find_company(company_name)`: searches for matching companies. company_name can be a partial match, i.e. `find_company sob` will match the company "Sobrr".
 
 `all_companies`: list all companies
 
@@ -75,7 +75,7 @@ If a method takes arguments, append them to the method call without quotes
 
 `remigrate`: drop tables and run migrations again
 
-## TODO (fork please)
+## TODO
 
 - Use many migrations instead of just one
 - Add reminder system for when to follow up with companies

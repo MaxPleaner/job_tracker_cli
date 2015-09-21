@@ -1,9 +1,11 @@
+require 'byebug'
 require 'awesome_print'
 require 'colored'
 require 'sqlite3'
 require 'active_record'
 
-sqlite_db = SQLite3::Database.new("job_tracker_cli.db")
+DATABASE_FILENAME = "job_tracker_cli.db"
+SQLite3::Database.new(DATABASE_FILENAME)
 ActiveRecord::Base.establish_connection(
 	adapter: 'sqlite3',
 	database: 'job_tracker_cli.db'
@@ -46,8 +48,13 @@ class App
 		Migrations.migrate(:up)
 	end
 	def self.remigrate
-		Migrations.migrate(:down)
-		Migrations.migrate(:up)
+		puts "are you sure? Database contents will be deleted. (y to continue)"
+		if gets.chomp.downcase == "y"
+			Migrations.migrate(:down)
+			Migrations.migrate(:up)
+		else
+			puts "cancelled".yellow
+		end
 	end
 	def self.quit
 		exit
@@ -60,9 +67,13 @@ class App
 		if company.valid?
 			ap(company.attributes)
 			puts "create an event for this company? (y for yes)"
-			add_event(company_name) if gets.chomp.downcase == "y" 
+			if gets.chomp.downcase == "y" 
+				add_event(company_name)
+			else
+				puts "cancelled".yellow
+			end
 		else
-			fail(StandardError, company.errors.full_messages)
+			raise StandardError, company.errors.full_messages
 		end
 	end
 	def self.find_company(company_name="")
@@ -133,9 +144,13 @@ when "console"
 			puts "ok".green
 		rescue StandardError => error
 			puts error, error.backtrace
-			if error.class == ActiveRecord::StatementInvalid
+			if error.message.scan(/table.+already\sexists/)
+				puts "Migrations have already been run.".yellow
+			elsif error.class == ActiveRecord::StatementInvalid
 				puts "Active Record error - did you run the migrations?".yellow
-				puts "Do so by typing migrate or reset the db by typing remigrate (will wipe data)".yellow
+			end
+			if error.class == SQLite3::SQLException
+				true
 			end
 			puts "error".red
 		end

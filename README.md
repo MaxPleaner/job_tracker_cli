@@ -27,31 +27,29 @@ If a method takes arguments, append them to the method call without quotes
 
 (i.e. `add_company some_company_name`)
 
-Methods: 
+`help`: lists available methods
+`quit`: exits the program
 
-- `migrate` - run the migrations
+Companies 
+`add_company(company_name)`: creates a company record
+`find_company(company_name)`: searches for matching companies. company_name can be a partial match, i.e. `find_company obrr` will match the company "Sobrr".
+`all_companies`: list all companies
 
-- `remigrate` - drop tables and run migrations again
+Events
+`add_event(company_name)`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
+`company_events(company_name)`: lists events associated with the given company
+`responses`: list all events which are responses from companies
 
-- `quit` - exits the program
+Application Counts
+`last_day_applied_count`: num companies added in last 24 hours
+`total_applied_count`: total number of companies
 
-- `help` - lists available methods
-
-- `add_company(company_name)` - creates a company record
-
-- `find_company(company_name)` - searches for matching companies. company_name can be a partial match, i.e. `find_company obrr` will match the company "Sobrr".
-- `all_companies` - lists all companies
-
-- `add_event(company_name)` - add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true. 
-
-- `company_events(company_name)` - lists events associated with the given company
-
-- `responses` - list all events which are responses from companies
-
+Database
+`migrate`: run the migrations
+`remigrate`: drop tables and run migrations again
 
 ## TODO (fork please)
 
-- add some sort of reminder system for when to follow up with companies
-
-- use a human-readable storage format like YAML or JSON 
-
+- add reminder system for when to follow up with companies
+- add web interface with CRUD forms
+- hack the mainframe

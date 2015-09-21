@@ -87,6 +87,7 @@ If a method takes arguments, append them to the method call without quotes
 
 ## TODO
 
+- more categories for events, i.e. "phone screen" or "coding challenge"
 - Refactor app.rb into different files
 - Use many migrations instead of just one
 - Add reminder system for when to follow up with companies

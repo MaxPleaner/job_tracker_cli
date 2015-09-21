@@ -23,6 +23,7 @@ class Migrations < ActiveRecord::Migration
       t.integer :company_id
       t.text :content
       t.boolean :is_response, default: false
+      t.boolean :is_scheduled, default: false
       t.timestamps null: false
     end
   end
@@ -71,8 +72,6 @@ class App
       puts "create an event for this company? (y for yes)"
       if gets.chomp.downcase == "y" 
         add_event(company_name)
-      else
-        puts "cancelled".yellow
       end
     else
       raise StandardError, company.errors.full_messages
@@ -139,9 +138,12 @@ class App
     content = $stdin.readlines.join
     puts "is the event a response from the company? Type 'y' for yes".yellow
     is_response = (gets.chomp.downcase == "y")
+    puts "is the event scheduled for some time in the future? ('y' for yes)".yellow
+    is_scheduled = (gets.chomp.downcase == "y")
     event = Company.find_by(name: company_name).events.create(
       content:content,
-      is_response: is_response
+      is_response: is_response,
+      is_scheduled: is_scheduled
     )
     ap event.attributes
   end
@@ -155,6 +157,16 @@ class App
       .where(is_response: true)
       .order(created_at: :asc)
       .map(&:attributes)
+  end
+  def self.scheduled_events
+    ap Event
+      .where(is_scheduled: true)
+      .order(created_at: :asc)
+      .map(&:attributes)
+  end
+  def self.mark_unscheduled(event_id)
+    # for when a scheduled event has already passed
+    Event.find(event_id).update(is_scheduled: false)
   end
   def self.total_applied_count
       ap Company.count

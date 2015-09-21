@@ -79,8 +79,7 @@ class App
   end
   def self.find_company(company_name="")
     ap Company
-        .where("name LIKE ?", "%#{company_name}%")
-        .order(created_at: :asc)
+        .where("name LIKE ?", "%#{company_name}%").order(created_at: :asc)
         .map(&:attributes)
   end
   def self.all_companies
@@ -89,27 +88,24 @@ class App
   end
   def self.rejected_companies
     ap Company
-    .where(rejected: true)
-    .order(created_at: :asc)
-    .map(&:attributes)
+    .where(rejected: true).order(created_at: :asc).map(&:attributes)
   end
   def self.non_rejected_companies
     ap Company
-      .where(rejected: false)
-      .order(created_at: :asc)
-      .map(&:attributes)
+      .where(rejected: false).order(created_at: :asc).map(&:attributes)
   end
   def self.responded_companies
     ap Company
-      .where(responded: true)
-      .order(created_at: :asc)
-      .map(&:attributes)
+      .where(responded: true).order(created_at: :asc).map(&:attributes)
   end
   def self.non_responded_companies
     ap Company
-      .where(responded: false)
-      .order(created_at: :asc)
-      .map(&:attributes)
+      .where(responded: false).order(created_at: :asc).map(&:attributes)
+  end
+  def self.pending_responded_companies
+    # companies which have responded and not rejected
+    ap Company.where(responded: true, rejected: false)
+      .order(created_at: :asc).map(&:attributes)
   end
   def self.responded_percentage
     ap ((
@@ -134,13 +130,23 @@ class App
     company.update(responded: true)
   end
   def self.add_event(company_name)
+    company = Company.find_by(name: company_name)
+    raise CompanyNotFoundError unless company
     puts "enter content (to end input, type enter then control+d )".yellow
     content = $stdin.readlines.join
-    puts "is the event a response from the company? Type 'y' for yes".yellow
+    puts "is the event a response from the company? ('y' for yes)".yellow
     is_response = (gets.chomp.downcase == "y")
-    puts "is the event scheduled for some time in the future? ('y' for yes)".yellow
-    is_scheduled = (gets.chomp.downcase == "y")
-    event = Company.find_by(name: company_name).events.create(
+    company.update(responded: true) if is_response
+    puts "is the event a rejection? ('y' for yes)".yellow
+    is_rejection = gets.chomp.downcase == 'y'
+    if is_rejection
+      company.update(rejected: true)
+      is_scheduled = false
+    else
+      puts "is the event scheduled for some time in the future? ('y' for yes)".yellow
+      is_scheduled = (gets.chomp.downcase == "y")
+    end
+    event = company.events.create(
       content:content,
       is_response: is_response,
       is_scheduled: is_scheduled
@@ -154,15 +160,11 @@ class App
   end
   def self.responses
     ap Event
-      .where(is_response: true)
-      .order(created_at: :asc)
-      .map(&:attributes)
+      .where(is_response: true).order(created_at: :asc).map(&:attributes)
   end
   def self.scheduled_events
     ap Event
-      .where(is_scheduled: true)
-      .order(created_at: :asc)
-      .map(&:attributes)
+      .where(is_scheduled: true).order(created_at: :asc).map(&:attributes)
   end
   def self.mark_unscheduled(event_id)
     # for when a scheduled event has already passed
@@ -173,8 +175,7 @@ class App
   end
   def self.last_day_applied_count
     ap Company
-      .where(created_at: (Time.now - 24.hours)..Time.now)
-      .count
+      .where(created_at: (Time.now - 24.hours)..Time.now).count
   end
 end
 

@@ -68,7 +68,7 @@ class App
 	def self.find_company(company_name="")
 		ap Company
 				.where("name LIKE ?", "%#{company_name}%")
-				.order(created_at: :desc)
+				.order(created_at: :asc)
 				.map(&:attributes)
 	end
 	def self.all_companies
@@ -89,14 +89,22 @@ class App
 	def self.company_events(company_name)
 		ap Company.find_by(name: company_name)
 			.events
-			.order(created_at: :desc)
+			.order(created_at: :asc)
 			.map(&:attributes)
 	end
 	def self.responses
 		ap Event
 			.where(is_response: true)
-			.order(created_at: :desc)
+			.order(created_at: :asc)
 			.map(&:attributes)
+	end
+	def self.total_applied_count
+		  ap Company.count
+	end
+	def self.last_day_applied_count
+		ap Company
+			.where(created_at: (Time.now - 24.hours)..Time.now)
+			.count
 	end
 end
 

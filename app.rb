@@ -26,11 +26,19 @@ class Migrations < ActiveRecord::Migration
       t.boolean :is_scheduled, default: false
       t.timestamps null: false
     end
+    create_table :todos do |t|
+      t.text :content
+      t.timestamps null: false
+    end
   end
   def down
     drop_table :companies
+    drop_table :todos
     drop_table :events
   end
+end
+
+class Todo < ActiveRecord::Base
 end
 
 class Company < ActiveRecord::Base
@@ -43,6 +51,15 @@ class Event < ActiveRecord::Base
   validates :content, presence: true
   def attributes
     super.merge("company_name" => company.name)
+  end
+end
+
+class Print
+  def self.print_companies(companies)
+    ap companies.map(&:attributes)
+  end
+  def self.print_events(events)
+    ap events.map(&:attributes)
   end
 end
 
@@ -66,12 +83,58 @@ class App
     exit
   end
   def self.help
-    ap methods(false)
+    puts <<-TXT
+Help / Quit
+---------
+help() 
+quit() 
+readme() 
+
+Companies
+---------
+all_companies() 
+add_company(company_name)
+find_company(*company_name)
+non_rejected() 
+non_responded() 
+rejected() 
+responded() 
+responded_non_rejected() 
+
+Events
+---------
+events(company_name)
+add_event(company_name)
+add_rejection(company_name)
+mark_unscheduled(event_id)
+responses() 
+scheduled() 
+
+Todos
+---------
+todos() 
+add_todo() 
+delete_todo(id)
+
+Counts
+---------
+applied_count() 
+last_day_applied_count() 
+rejected_percentage() 
+responded_percentage() 
+responded_rejected_percentage() 
+
+Migration
+---------
+migrate()
+remigrate() 
+
+    TXT
   end
   def self.add_company(company_name)
     company = Company.create(name: company_name)
     if company.valid?
-      ap(company.attributes)
+      Print.print_companies([company])
       puts "create an event for this company? (y for yes)"
       if gets.chomp.downcase == "y" 
         add_event(company_name)
@@ -81,57 +144,67 @@ class App
     end
   end
   def self.find_company(company_name="")
-    ap Company
-        .where("name LIKE ?", "%#{company_name}%").order(created_at: :asc)
-        .map(&:attributes)
+    Print.print_companies(Company
+      .where("name LIKE ?", "%#{company_name}%")
+      .order(updated_at: :asc)
+    )
   end
   def self.all_companies
     find_company
     # when called without args, find_company lists all
   end
-  def self.rejected_companies
-    ap Company
-    .where(rejected: true).order(created_at: :asc).map(&:attributes)
+  def self.rejected
+    Print.print_companies(Company
+      .where(rejected: true)
+      .order(updated_at: :asc)
+    )
   end
-  def self.non_rejected_companies
-    ap Company
-      .where(rejected: false).order(created_at: :asc).map(&:attributes)
+  def self.non_rejected
+    Print.print_companies(Company
+      .where(rejected: false)
+      .order(updated_at: :asc)
+    )
   end
-  def self.responded_companies
-    ap Company
-      .where(responded: true).order(created_at: :asc).map(&:attributes)
+  def self.responded
+    Print.print_companies(Company
+      .where(responded: true).order(updated_at: :asc)
+    )
   end
-  def self.non_responded_companies
-    ap Company
-      .where(responded: false).order(created_at: :asc).map(&:attributes)
+  def self.non_responded
+    Print.print_companies(Company
+      .where(responded: false).order(updated_at: :asc)
+    )
   end
-  def self.pending_responded_companies
-    # companies which have responded and not rejected
-    ap Company.where(responded: true, rejected: false)
-      .order(created_at: :asc).map(&:attributes)
+  def self.responded_non_rejected
+    Print.print_companies(Company.where(responded: true, rejected: false)
+      .order(updated_at: :asc)
+    )
   end
   def self.responded_percentage
     ap ((
-      Company.where(responded: true).order(created_at: :asc).count.to_f /
+      Company.where(responded: true).count.to_f /
       Company.count.to_f
     ) * 100).round(2).to_s + "%"
   end
   def self.rejected_percentage
     ap ((
-      Company.where(rejected: true).order(created_at: :asc).count.to_f /
+      Company.where(rejected: true).count.to_f /
       Company.count.to_f
     ) * 100).round(2).to_s + "%"
   end
-  def self.mark_rejected(company_name)
-    company = Company.find_by(name: company_name)
-    raise CompanyNotFoundError unless company
-    company.update(rejected: true)
+  def self.responded_rejected_percentage
+    rejected = Company.where(rejected: true).count.to_f
+    responded = Company.where(responded: true).count.to_f
+    ap ((
+      rejected /
+      (responded + rejected)
+    ) * 100).round(2).to_s + "%"
   end
-  def self.mark_responded(company_name)
-    company = Company.find_by(name: company_name)
-    raise CompanyNotFoundError unless company
-    company.update(responded: true)
-  end
+  # def self.mark_rejected(company_name)
+  #   company = Company.find_by(name: company_name)
+  #   raise CompanyNotFoundError unless company
+  #   company.update(rejected: true)
+  # end
   def self.add_event(company_name)
     company = Company.find_by(name: company_name)
     raise CompanyNotFoundError unless company
@@ -154,38 +227,71 @@ class App
       is_response: is_response,
       is_scheduled: is_scheduled
     )
-    ap event.attributes
+    company.events
+      .select { |e| e.is_scheduled }
+      .each { |e| e.update(is_scheduled: false) }
+    Print.print_events([event])
   end
-  def self.company_events(company_name)
+  def self.add_rejection(company_name)
+    company = Company.find_by(name: company_name)
+    raise CompanyNotFOundError unless company
+    company.events.create(
+      content: "rejected"
+    )
+    company.events
+      .select { |e| e.is_scheduled }
+      .each { |e| e.update(is_scheduled: false) }
+    company.update(rejected: true)
+  end
+  def self.events(company_name)
     company = Company.find_by(name: company_name)
     raise CompanyNotFoundError unless company
-    ap company.events.order(created_at: :asc).map(&:attributes)
+    Print.print_events(company.events.order(updated_at: :asc))
   end
   def self.responses
-    ap Event
-      .where(is_response: true).order(created_at: :asc).map(&:attributes)
+    Print.print_events(Event
+      .where(is_response: true)
+      .order(updated_at: :asc)
+    )
   end
-  def self.scheduled_events
-    ap Event
-      .where(is_scheduled: true).order(created_at: :asc).map(&:attributes)
+  def self.scheduled
+    Print.print_events(Event
+      .where(is_scheduled: true)
+      .order(updated_at: :asc)
+    )
   end
   def self.mark_unscheduled(event_id)
     # for when a scheduled event has already passed
     Event.find(event_id).update(is_scheduled: false)
   end
-  def self.total_applied_count
+  def self.applied_count
       ap Company.count
   end
   def self.last_day_applied_count
     ap Company
       .where(created_at: (Time.now - 24.hours)..Time.now).count
   end
+  def self.add_todo
+    puts "enter todo content".yellow
+    input = readlines
+    Todo.create(content: input.join)
+  end
+  def self.todos
+    ap Todo.all.map { |t| {id: t.id, content: t.content} }
+  end
+  def self.delete_todo(id)
+    Todo.find(id).delete
+  end
 end
 
 class CompanyNotFoundError < StandardError
 end
 
+
+
 case ARGV.shift # needs to be shifted, otherwise it interferes with gets
+when "server"
+  File.open("./html/index.html")
 when "byebug"
   require 'byebug'
   byebug
@@ -223,5 +329,3 @@ when "console"
     end
   end
 end
-
-lists

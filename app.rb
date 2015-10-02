@@ -89,6 +89,7 @@ Help / Quit
 help() 
 quit() 
 readme() 
+find_record(company)
 
 Companies
 ---------
@@ -107,6 +108,7 @@ events(company_name)
 add_event(company_name)
 add_rejection(company_name)
 mark_unscheduled(event_id)
+mark_scheduled(event_id)
 responses() 
 scheduled() 
 
@@ -148,6 +150,9 @@ remigrate()
       .where("name LIKE ?", "%#{company_name}%")
       .order(updated_at: :asc)
     )
+  end
+  def self.find_record(company)
+    puts `grep -nri #{company}* ~/Desktop/jobs` 
   end
   def self.all_companies
     find_company
@@ -220,16 +225,16 @@ remigrate()
       is_scheduled = false
     else
       puts "is the event scheduled for some time in the future? ('y' for yes)".yellow
-      is_scheduled = (gets.chomp.downcase == "y")
+      is_scheduled = gets.chomp.downcase
+      puts is_scheduled
+      puts (is_scheduled == 'y')
+      is_scheduled = (is_scheduled == 'y')
     end
     event = company.events.create(
-      content:content,
+      content: content,
       is_response: is_response,
       is_scheduled: is_scheduled
     )
-    company.events
-      .select { |e| e.is_scheduled }
-      .each { |e| e.update(is_scheduled: false) }
     Print.print_events([event])
   end
   def self.add_rejection(company_name)
@@ -259,6 +264,9 @@ remigrate()
       .where(is_scheduled: true)
       .order(updated_at: :asc)
     )
+  end
+  def self.mark_scheduled(event_id)
+    Event.find(event_id).update(is_scheduled: true)
   end
   def self.mark_unscheduled(event_id)
     # for when a scheduled event has already passed

@@ -95,7 +95,7 @@ Companies
 ---------
 all_companies() 
 add_company(company_name)
-find_company(*company_name)
+find(*company_name)
 non_rejected() 
 non_responded() 
 rejected() 
@@ -145,18 +145,18 @@ remigrate()
       raise StandardError, company.errors.full_messages
     end
   end
-  def self.find_company(company_name="")
+  def self.find(company_name="")
     Print.print_companies(Company
       .where("name LIKE ?", "%#{company_name}%")
       .order(updated_at: :asc)
     )
   end
   def self.find_record(company)
-    puts `grep -nri #{company}* ~/Desktop/jobs` 
+    ap `grep -nri #{company}* ~/Desktop/jobs` 
   end
   def self.all_companies
-    find_company
-    # when called without args, find_company lists all
+    find
+    # when called without args, find lists all
   end
   def self.rejected
     Print.print_companies(Company

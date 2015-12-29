@@ -35,9 +35,9 @@ If a method takes arguments, append them to the method call without quotes
 
 **Companies** 
 
-`add_company(company_name)`: creates a company record
+`add_company company_name`: creates a company record
 
-`find_company(company_name)`: searches for matching companies. company_name can be a partial match, i.e. `find_company sob` will match the company "Sobrr".
+`find_company company_name`: searches for matching companies. company_name can be a partial match, i.e. `find_company sob` will match the company "Sobrr".
 
 `all_companies`: list all companies
 
@@ -49,9 +49,9 @@ If a method takes arguments, append them to the method call without quotes
 
 `rejected_percentage`: list percentage of companies which have rejected
 
-`mark_rejected(company_name)`: mark a company as rejected
+`mark_rejected company_name`: mark a company as rejected
 
-`mark_responded(company_name)`: mark a company as responded
+`mark_responded company_name`: mark a company as responded
 
 `pending_responded_companies`: companies which have responded but not rejected
 
@@ -59,15 +59,15 @@ If a method takes arguments, append them to the method call without quotes
 
 **Events**
 
-`add_event(company_name)`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
+`add_event company_name`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
 
-`company_events(company_name)`: lists events associated with the given company
+`company_events company_name`: lists events associated with the given company
 
 `responses`: list all events which are responses from companies
 
 `scheduled_events`: list all events with :is_scheduled as true. I.e. homework (coding challenges), scheduled interviews or phone screens. 
 
-`mark_unscheduled(event_id)`: set :is_scheduled to false. For example, when a scheduled phone screen has already happened.
+`mark_unscheduled event_id`: set :is_scheduled to false. For example, when a scheduled phone screen has already happened.
 
 **Application Counts**
 

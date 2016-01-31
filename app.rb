@@ -280,9 +280,9 @@ remigrate()
       .where(created_at: (Time.now - 24.hours)..Time.now).count
   end
   def self.add_todo
-    puts "enter todo content".yellow
-    input = readlines
-    Todo.create(content: input.join)
+    puts "enter todo content (1 line only)".yellow
+    input = gets.chomp
+    Todo.create(content: input)
   end
   def self.todos
     ap Todo.all.map { |t| {id: t.id, content: t.content} }
@@ -304,6 +304,34 @@ when "byebug"
   require 'byebug'
   byebug
   true
+when "script"
+  arg = ARGV.shift
+  case arg
+  when "all_companies"
+    App.all_companies
+  when "non_responded"
+    App.non_responded
+  when "responded_non_rejected"
+    App.responded_non_rejected
+  when "events"
+    company_name = ARGV.shift
+    unless company_name.blank?
+      App.events(company_name)
+    end
+  when "scheduled"
+    App.scheduled
+  when "responses"
+    App.responses
+  when "todos"
+    App.todos
+  else
+    unless arg.blank?
+      company_name = ARGV.shift
+      unless company_name.blank?
+        App.find company_name
+      end
+    end
+  end
 when "console"
   puts "Job Application Tracker".bold
   puts "to see commands, type help"

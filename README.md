@@ -21,6 +21,8 @@ Tracks job applications. Written in Ruby.
 
 ## Usage
 
+### Note some of these might be out date, look at app.rb
+
 To call a method from the console, enter the method's name.
 
 If a method takes arguments, append them to the method call without quotes
@@ -61,7 +63,7 @@ If a method takes arguments, append them to the method call without quotes
 
 `add_event company_name`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
 
-`company_events company_name`: lists events associated with the given company
+`events company_name`: lists events associated with the given company
 
 `responses`: list all events which are responses from companies
 

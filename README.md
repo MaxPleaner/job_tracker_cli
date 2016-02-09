@@ -93,6 +93,4 @@ If a method takes arguments, append them to the method call without quotes
 - Refactor app.rb into different files
 - Use many migrations instead of just one
 - Add reminder system for when to follow up with companies
-- API (JSON)
 - Add web interface with CRUD forms
-- Hack the mainframe

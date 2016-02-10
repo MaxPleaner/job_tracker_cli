@@ -4,11 +4,11 @@ require 'colored'
 require 'sqlite3'
 require 'active_record'
 
-DATABASE_FILENAME = "job_tracker_cli.db"
+DATABASE_FILENAME = File.expand_path("../job_tracker_cli.db", __FILE__)
 SQLite3::Database.new(DATABASE_FILENAME)
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
-  database: 'job_tracker_cli.db'
+  database: DATABASE_FILENAME
 )
 
 class Migrations < ActiveRecord::Migration
@@ -78,6 +78,9 @@ class App
     else
       puts "cancelled".yellow
     end
+  end
+  def self.exit
+    super
   end
   def self.quit
     exit
@@ -154,7 +157,7 @@ remigrate()
   def self.find_record(company)
     ap `grep -nri #{company}* ~/Desktop/jobs` 
   end
-  def self.all_companies
+  def self.all_companies()
     find
     # when called without args, find lists all
   end
@@ -305,6 +308,12 @@ when "byebug"
   byebug
   true
 when "script"
+  begin
+    # Db test connection
+    Company.count
+  rescue StandardError => e
+    App.migrate
+  end
   arg = ARGV.shift
   case arg
   when "all_companies"

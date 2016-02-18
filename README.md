@@ -14,7 +14,9 @@ Some useful commands:
 - `add_event(company_name)`
 - `find(company_name_to_search)
 - `all_companies`
-- `backup` - writes to backup.yml
+- `backup` or `backup(true)` - writes to backup.yml
+- `read_backup` prints the backup file
+
 The source for these commands is `job_tracker_api.rb`, where the CLI
 base is in `job_tracker_cli`.
 

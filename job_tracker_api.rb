@@ -104,6 +104,9 @@ class JobTrackerApi
       file.write(YAML.dump(companies))
     end
   end
+  def read_backup
+    puts `cat #{BasePath}/backup.yml`
+  end
   def readme
     puts File.read('./README.md')
   end

@@ -66,6 +66,9 @@ class Company < ActiveRecord::Base
       "#{name} events" => events.map(&:public_attrs)
     }.reject { |k,v| v.blank? }
   end
+  def attributes
+    super.merge({'record_class' => "company"})
+  end
 end
 
 class Event < ActiveRecord::Base
@@ -81,6 +84,9 @@ class Event < ActiveRecord::Base
     {
       'event' => "#{company.name} event #{"#" + id.to_s} #{"- response" if is_response} #{"- scheduled" if is_scheduled} #{content} - #{created_str.call(created_at.to_i)} "
     }
+  end
+  def attributes
+    super.merge({'record_class' => "event"})
   end
 end
 
@@ -100,12 +106,38 @@ class JobTrackerApi
     companies = Company.all.includes(:events).map do |company|
       company.public_attrs(verbose)
     end
+    if verbose
+      companies += Event.all.map(&:attributes)
+    end
     File.open("#{BasePath}/backup.yml", 'w') do |file|
       file.write(YAML.dump(companies))
     end
   end
   def read_backup
     puts `cat #{BasePath}/backup.yml`
+  end
+  def import_backup
+    YAML.load(File.read("#{BasePath}/backup.yml")).each do |record|
+      unless record.is_a?(Hash) && record.has_key?('id')
+        puts "error - badly formatted backup"
+      end
+      case record['record_class']
+      when 'company'
+        (puts("company #{record['id']} exists"); next) if Company.exists?(id: record['id'])
+        company = Company.create(record.reject { |k,v| k.in?("record_class") })
+        byebug unless company.valid?
+      when 'event'
+        (puts("event #{record['id']} exists"); next) if Event.exists?(id: record['id'])
+        event = Event.create(record.reject { |k,v| k.in?("record_class") })
+        byebug unless event.valid?
+      else
+        # byebug
+      end
+    end
+    puts "-------------"
+    puts "finished"
+    puts "now #{Company.count} companies"
+    puts "now #{Event.count} companies" 
   end
   def readme
     puts File.read('./README.md')

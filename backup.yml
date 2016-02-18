@@ -1,2 +1,18 @@
 ---
-- company: Twitter   - 2016-01-01 00:00:00 -0800
+- id: 1
+  name: asd
+  rejected: true
+  responded: true
+  created_at: 2016-02-18 08:30:05.210256000 Z
+  updated_at: 2016-02-18 08:31:33.534612000 Z
+  record_class: company
+- id: 1
+  company_id: 1
+  content: |
+    aksdmaskdma
+    askdm
+  is_response: true
+  is_scheduled: true
+  created_at: 2016-02-18 08:35:28.740441000 Z
+  updated_at: 2016-02-18 08:35:28.740441000 Z
+  record_class: event

@@ -14,11 +14,13 @@ Some useful commands:
 - `all_companies`
 - `backup` - writes to backup.yml
 - `read_backup` prints the backup file
+- `import_backup` from backup.yml
 
 The source for these commands is `db/job_tracker_api.rb`, where the CLI
 base is in `job_tracker_cli`.
 
 The database by default is `job_tracker_cli.db` (sqlite). The db/ folder is ignored by git.
+The backup doesnt include todos.
 
 By default, the `backup` command will write a concise summary of the database into
 `backup.yml`. To do a full export which can be re-imported, use `backup(true)`

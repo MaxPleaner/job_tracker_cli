@@ -10,9 +10,9 @@ Some useful commands:
 - `remigrate` _deletes everything_
 - `add_company(name)`
 - `add_event(company_name)`
-- `find(company_name_to_search)
+- `find(company_name_to_search)`
 - `all_companies`
-- `backup` or `backup(true)` - writes to backup.yml
+- `backup` - writes to backup.yml
 - `read_backup` prints the backup file
 
 The source for these commands is `job_tracker_api.rb`, where the CLI

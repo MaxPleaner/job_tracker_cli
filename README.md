@@ -16,9 +16,9 @@ Some useful commands:
 - `read_backup` prints the backup file
 
 The source for these commands is `db/job_tracker_api.rb`, where the CLI
-base is in `job_tracker_cli`. The db/ folder is ignored by git
+base is in `job_tracker_cli`.
 
-The database by default is `job_tracker_cli.db` (sqlite).
+The database by default is `job_tracker_cli.db` (sqlite). The db/ folder is ignored by git.
 
 By default, the `backup` command will write a concise summary of the database into
 `backup.yml`. To do a full export which can be re-imported, use `backup(true)`

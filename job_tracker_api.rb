@@ -54,15 +54,16 @@ end
 class Company < ActiveRecord::Base
   has_many :events
   validates :name, presence: true, uniqueness: {case_sensitive: false}
-  def attributes
+  def public_attrs(verbose=false)
+    return self.attributes if verbose
     created_str = ->(timestamp) {
       DateTime.new(timestamp)
               .strftime("%b %d (%A)")
               .in_time_zone("Pacific Time (US & Canada)")
     }
     {
-      'company' => "#{name} - #{created_str.call(created_at.to_i)} #{"- rejected" if rejected} #{"- responsed" if responded}",
-      "#{name} events" => events.map(&:attributes)
+      'company' => "#{name} #{"- rejected" if rejected} #{"- responsed" if responded} - #{created_str.call(created_at.to_i)}",
+      "#{name} events" => events.map(&:public_attrs)
     }.reject { |k,v| v.blank? }
   end
 end
@@ -70,33 +71,34 @@ end
 class Event < ActiveRecord::Base
   belongs_to :company
   validates :content, presence: true
-  def attributes
+  def public_attrs(verbose=false)
+    return self.attributes if verbose
     created_str = ->(timestamp) {
       DateTime.new(timestamp)
               .strftime("%b %d (%A)")
               .in_time_zone("Pacific Time (US & Canada)")
     }
     {
-      'event' => "#{company.name} event #{"#" + id.to_s} - #{created_str.call(created_at.to_i)} #{"- response" if is_response} #{"- scheduled" if is_scheduled} #{content} "
+      'event' => "#{company.name} event #{"#" + id.to_s} #{"- response" if is_response} #{"- scheduled" if is_scheduled} #{content} - #{created_str.call(created_at.to_i)} "
     }
   end
 end
 
 class Print
   def self.print_companies(companies)
-    ap companies.map(&:attributes)
+    ap companies.map(&:public_attrs)
   end
   def self.print_events(events)
-    ap events.map(&:attributes)
+    ap events.map(&:public_attrs)
   end
 end
 
 class JobTrackerApi
   def initialize(options={})
   end
-  def backup
+  def backup(verbose=false)
     companies = Company.all.includes(:events).map do |company|
-      company.attributes
+      company.public_attrs(verbose)
     end
     File.open("#{BasePath}/backup.yml", 'w') do |file|
       file.write(YAML.dump(companies))

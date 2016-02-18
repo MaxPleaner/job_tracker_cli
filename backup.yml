@@ -1,6 +1,4 @@
 ---
-- company: 'Twitter - 2016-01-01 00:00:00 -0800  '
-- company: 'test - 2016-01-01 00:00:00 -0800  '
-- company: 'test1 - 2016-01-01 00:00:00 -0800 - rejected '
-  test1 events:
-  - event: "test1 event #1 - 2016-01-01 00:00:00 -0800   askdasmdkmas\naksmdaskmdkma\n "
+- company: asd - rejected - responsed - 2016-01-01 00:00:00 -0800
+  asd events:
+  - event: "asd event #1 - response  askdmaskdm\n - 2016-01-01 00:00:00 -0800 "

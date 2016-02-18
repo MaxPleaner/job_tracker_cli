@@ -19,10 +19,10 @@ require "awesome_print"
 # define the source for commands
 #---------------------------------------------------------------------------------------------------------------------
 # use lib/commands.rb as the source for the COMMANDS_CLASS constant
-COMMANDS_FILE = "lib/commands.rb"
+COMMANDS_FILE = "job_tracker_api.rb"
 require_relative COMMANDS_FILE
 # Set a variable equaling the class which is loaded from COMMANDS_FILE
-COMMANDS_CLASS = Commands
+COMMANDS_CLASS = JobTrackerApi
 
 #---------------------------------------------------------------------------------------------------------------------
 # the CLI base

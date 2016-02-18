@@ -16,3 +16,9 @@ source "http://rubygems.org"
 
 # Show method sources
   gem "method_source"
+
+gem 'awesome_print'
+gem "colored"
+gem "sqlite3"
+gem "activerecord"
+gem 'activesupport'

@@ -5,6 +5,7 @@ require 'colored'
 require 'sqlite3'
 require 'active_record'
 require 'yaml'
+require 'active_support/all'
 
 BasePath = "/home/max/job_tracker_cli"
 
@@ -80,10 +81,10 @@ class Print
   end
 end
 
-class App
+class JobTrackerApi
   def initialize(options={})
   end
-  def self.backup
+  def backup
     companies = Company.all.includes(:events).map do |company|
       company.attributes.merge('events' => company.events.map(&:attributes))
     end
@@ -91,13 +92,13 @@ class App
       file.write(YAML.dump(companies))
     end
   end
-  def self.readme
+  def readme
     puts File.read('./README.md')
   end
-  def self.migrate
+  def migrate
     Migrations.migrate(:up)
   end
-  def self.remigrate
+  def remigrate
     puts "are you sure? Database contents will be deleted. (y to continue)"
     if gets.chomp.downcase == "y"
       Migrations.migrate(:down)
@@ -106,13 +107,13 @@ class App
       puts "cancelled".yellow
     end
   end
-  def self.exit
+  def exit
     super
   end
-  def self.quit
+  def quit
     exit
   end
-  def self.help
+  def help
 #     puts <<-TXT
 # help() 
 # quit() 
@@ -158,7 +159,7 @@ class App
 
 #     TXT
   end
-  def self.add_company(company_name)
+  def add_company(company_name)
     company = Company.create(name: company_name)
     if company.valid?
       Print.print_companies([company])
@@ -170,59 +171,59 @@ class App
       raise StandardError, company.errors.full_messages
     end
   end
-  def self.find(company_name="")
+  def find(company_name="")
     Print.print_companies(Company
       .where("name LIKE ?", "%#{company_name}%")
       .order(updated_at: :asc)
     )
   end
-  def self.find_record(company)
+  def find_record(company)
     ap `grep -nri #{company}* ~/Desktop/jobs` 
   end
-  def self.all_companies()
+  def all_companies()
     find
     # when called without args, find lists all
   end
-  def self.rejected
+  def rejected
     Print.print_companies(Company
       .where(rejected: true)
       .order(updated_at: :asc)
     )
   end
-  def self.non_rejected
+  def non_rejected
     Print.print_companies(Company
       .where(rejected: false)
       .order(updated_at: :asc)
     )
   end
-  def self.responded
+  def responded
     Print.print_companies(Company
       .where(responded: true).order(updated_at: :asc)
     )
   end
-  def self.non_responded
+  def non_responded
     Print.print_companies(Company
       .where(responded: false).order(updated_at: :asc)
     )
   end
-  def self.responded_non_rejected
+  def responded_non_rejected
     Print.print_companies(Company.where(responded: true, rejected: false)
       .order(updated_at: :asc)
     )
   end
-  def self.responded_percentage
+  def responded_percentage
     ap ((
       Company.where(responded: true).count.to_f /
       Company.count.to_f
     ) * 100).round(2).to_s + "%"
   end
-  def self.rejected_percentage
+  def rejected_percentage
     ap ((
       Company.where(rejected: true).count.to_f /
       Company.count.to_f
     ) * 100).round(2).to_s + "%"
   end
-  def self.responded_rejected_percentage
+  def responded_rejected_percentage
     rejected = Company.where(rejected: true).count.to_f
     responded = Company.where(responded: true).count.to_f
     ap ((
@@ -230,12 +231,12 @@ class App
       (responded + rejected)
     ) * 100).round(2).to_s + "%"
   end
-  # def self.mark_rejected(company_name)
+  # def mark_rejected(company_name)
   #   company = Company.find_by(name: company_name)
   #   raise CompanyNotFoundError unless company
   #   company.update(rejected: true)
   # end
-  def self.add_event(company_name)
+  def add_event(company_name)
     company = Company.find_by(name: company_name)
     raise CompanyNotFoundError unless company
     puts "enter content (to end input, type enter then control+d )".yellow
@@ -262,7 +263,7 @@ class App
     )
     Print.print_events([event])
   end
-  def self.add_rejection(company_name)
+  def add_rejection(company_name)
     company = Company.find_by(name: company_name)
     raise CompanyNotFOundError unless company
     company.events.create(
@@ -273,46 +274,46 @@ class App
       .each { |e| e.update(is_scheduled: false) }
     company.update(rejected: true)
   end
-  def self.events(company_name)
+  def events(company_name)
     company = Company.find_by(name: company_name)
     raise CompanyNotFoundError unless company
     Print.print_events(company.events.order(updated_at: :asc))
   end
-  def self.responses
+  def responses
     Print.print_events(Event
       .where(is_response: true)
       .order(updated_at: :asc)
     )
   end
-  def self.scheduled
+  def scheduled
     Print.print_events(Event
       .where(is_scheduled: true)
       .order(updated_at: :asc)
     )
   end
-  def self.mark_scheduled(event_id)
+  def mark_scheduled(event_id)
     Event.find(event_id).update(is_scheduled: true)
   end
-  def self.mark_unscheduled(event_id)
+  def mark_unscheduled(event_id)
     # for when a scheduled event has already passed
     Event.find(event_id).update(is_scheduled: false)
   end
-  def self.applied_count
+  def applied_count
       ap Company.count
   end
-  def self.last_day_applied_count
+  def last_day_applied_count
     ap Company
       .where(created_at: (Time.now - 24.hours)..Time.now).count
   end
-  def self.add_todo
+  def add_todo
     puts "enter todo content (1 line only)".yellow
     input = gets.chomp
     Todo.create(content: input)
   end
-  def self.todos
+  def todos
     ap Todo.all.map { |t| {id: t.id, content: t.content} }
   end
-  def self.delete_todo(id)
+  def delete_todo(id)
     Todo.find(id).delete
   end
 end
@@ -330,37 +331,37 @@ end
 #     # Db test connection
 #     Company.count
 #   rescue StandardError => e
-#     App.migrate
+#     JobTrackerCli.migrate
 #   end
 #   arg = ARGV.shift
 #   case arg
 #   when "all_companies"
-#     App.all_companies
+#     JobTrackerCli.all_companies
 #   when "non_responded"
-#     App.non_responded
+#     JobTrackerCli.non_responded
 #   when "responded_non_rejected"
-#     App.responded_non_rejected
+#     JobTrackerCli.responded_non_rejected
 #   when "events"
 #     company_name = ARGV.shift
 #     unless company_name.blank?
-#       App.events(company_name)
+#       JobTrackerCli.events(company_name)
 #     end
 #   when "scheduled"
-#     App.scheduled
+#     JobTrackerCli.scheduled
 #   when "responses"
-#     App.responses
+#     JobTrackerCli.responses
 #   when "todos"
-#     App.todos
+#     JobTrackerCli.todos
 #   else
 #     unless arg.blank?
 #       company_name = ARGV.shift
 #       unless company_name.blank?
-#         App.find company_name
+#         JobTrackerCli.find company_name
 #       end
 #     end
 #   end
 # when "console"
-#   puts "Job Application Tracker".bold
+#   puts "Job JobTrackerClilication Tracker".bold
 #   puts "to see commands, type help"
 #   puts "to exit, type quit"
 #   while true
@@ -370,11 +371,11 @@ end
 #       next if input.nil? || input.empty?
 #       args = input.chomp.split(" ")
 #       method = args.shift.to_sym
-#       unless App.methods(false).include?(method)
+#       unless JobTrackerCli.methods(false).include?(method)
 #         puts "method not found (type help to see methods)"
 #         next
 #       end
-#       App.send(method, *args)
+#       JobTrackerCli.send(method, *args)
 #       puts "ok".green
 #     rescue CompanyNotFoundError => error
 #       puts "company not found".yellow

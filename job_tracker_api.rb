@@ -9,7 +9,7 @@ require 'active_support/all'
 
 BasePath = "/home/max/job_tracker_cli"
 
-DATABASE_FILENAME = File.expand_path("#{BasePath}/job_tracker_cli.db", __FILE__)
+DATABASE_FILENAME = File.expand_path("#{BasePath}/db/job_tracker_cli.db", __FILE__)
 SQLite3::Database.new(DATABASE_FILENAME)
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',

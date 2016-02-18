@@ -48,27 +48,37 @@ end
 
 class Todo < ActiveRecord::Base
   def attributes
-    super.reject do |k,v|
-      k.in?(["id", "updated_at"])
-    end
   end
 end
 
 class Company < ActiveRecord::Base
-  def attributes
-    super.reject do |k,v|
-      k.in?(["id", "updated_at"])
-    end
-  end
   has_many :events
   validates :name, presence: true, uniqueness: {case_sensitive: false}
+  def attributes
+    created_str = ->(timestamp) {
+      DateTime.new(timestamp)
+              .strftime("%b %d (%A)")
+              .in_time_zone("Pacific Time (US & Canada)")
+    }
+    {
+      'company' => "#{name} - #{created_str.call(created_at.to_i)} #{"- rejected" if rejected} #{"- responsed" if responded}",
+      "#{name} events" => events.map(&:attributes)
+    }.reject { |k,v| v.blank? }
+  end
 end
 
 class Event < ActiveRecord::Base
   belongs_to :company
   validates :content, presence: true
   def attributes
-    super.merge("company_name" => company.name)
+    created_str = ->(timestamp) {
+      DateTime.new(timestamp)
+              .strftime("%b %d (%A)")
+              .in_time_zone("Pacific Time (US & Canada)")
+    }
+    {
+      'event' => "#{company.name} event #{"#" + id.to_s} - #{created_str.call(created_at.to_i)} #{"- response" if is_response} #{"- scheduled" if is_scheduled} #{content} "
+    }
   end
 end
 
@@ -86,7 +96,7 @@ class JobTrackerApi
   end
   def backup
     companies = Company.all.includes(:events).map do |company|
-      company.attributes.merge('events' => company.events.map(&:attributes))
+      company.attributes
     end
     File.open("#{BasePath}/backup.yml", 'w') do |file|
       file.write(YAML.dump(companies))

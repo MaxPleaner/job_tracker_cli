@@ -1,0 +1,8 @@
+---
+- id: 1
+  name: Twitter
+  rejected: false
+  responded: false
+  created_at: 2016-02-18 07:15:57.086233000 Z
+  updated_at: 2016-02-18 07:15:57.086233000 Z
+  :events: []

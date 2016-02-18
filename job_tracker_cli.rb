@@ -1,15 +1,22 @@
+#!/usr/bin/env ruby
 require 'byebug'
 require 'awesome_print'
 require 'colored'
 require 'sqlite3'
 require 'active_record'
+require 'yaml'
 
-DATABASE_FILENAME = File.expand_path("../job_tracker_cli.db", __FILE__)
+BasePath = "/home/max/job_tracker_cli"
+
+DATABASE_FILENAME = File.expand_path("#{BasePath}/job_tracker_cli.db", __FILE__)
 SQLite3::Database.new(DATABASE_FILENAME)
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
   database: DATABASE_FILENAME
 )
+
+class CompanyNotFoundError < StandardError
+end
 
 class Migrations < ActiveRecord::Migration
   def up
@@ -39,9 +46,19 @@ class Migrations < ActiveRecord::Migration
 end
 
 class Todo < ActiveRecord::Base
+  def attributes
+    super.reject do |k,v|
+      k.in?(["id", "updated_at"])
+    end
+  end
 end
 
 class Company < ActiveRecord::Base
+  def attributes
+    super.reject do |k,v|
+      k.in?(["id", "updated_at"])
+    end
+  end
   has_many :events
   validates :name, presence: true, uniqueness: {case_sensitive: false}
 end
@@ -64,6 +81,16 @@ class Print
 end
 
 class App
+  def initialize(options={})
+  end
+  def self.backup
+    companies = Company.all.includes(:events).map do |company|
+      company.attributes.merge('events' => company.events.map(&:attributes))
+    end
+    File.open("#{BasePath}/backup.yml", 'w') do |file|
+      file.write(YAML.dump(companies))
+    end
+  end
   def self.readme
     puts File.read('./README.md')
   end
@@ -86,55 +113,50 @@ class App
     exit
   end
   def self.help
-    puts <<-TXT
-Help / Quit
----------
-help() 
-quit() 
-readme() 
-find_record(company)
+#     puts <<-TXT
+# help() 
+# quit() 
+# readme() 
+# find_record(company)
+# all_companies() 
+# add_company(company_name)
+# find(*company_name)
+# non_rejected() 
+# non_responded() 
+# rejected() 
+# responded() 
+# responded_non_rejected() 
 
-Companies
----------
-all_companies() 
-add_company(company_name)
-find(*company_name)
-non_rejected() 
-non_responded() 
-rejected() 
-responded() 
-responded_non_rejected() 
+# Events
+# ---------
+# events(company_name)
+# add_event(company_name)
+# add_rejection(company_name)
+# mark_unscheduled(event_id)
+# mark_scheduled(event_id)
+# responses() 
+# scheduled() 
 
-Events
----------
-events(company_name)
-add_event(company_name)
-add_rejection(company_name)
-mark_unscheduled(event_id)
-mark_scheduled(event_id)
-responses() 
-scheduled() 
+# Todos
+# ---------
+# todos() 
+# add_todo() 
+# delete_todo(id)
 
-Todos
----------
-todos() 
-add_todo() 
-delete_todo(id)
+# Counts
+# ---------
+# applied_count() 
+# last_day_applied_count() 
+# rejected_percentage() 
+# responded_percentage() 
+# responded_rejected_percentage() 
 
-Counts
----------
-applied_count() 
-last_day_applied_count() 
-rejected_percentage() 
-responded_percentage() 
-responded_rejected_percentage() 
+# Migration
+# ---------
+# migrate()
+# remigrate() 
 
-Migration
----------
-migrate()
-remigrate() 
-
-    TXT
+#     TXT
   end
   def self.add_company(company_name)
     company = Company.create(name: company_name)
@@ -295,82 +317,78 @@ remigrate()
   end
 end
 
-class CompanyNotFoundError < StandardError
-end
 
-
-
-case ARGV.shift # needs to be shifted, otherwise it interferes with gets
-when "server"
-  File.open("./html/index.html")
-when "byebug"
-  require 'byebug'
-  byebug
-  true
-when "script"
-  begin
-    # Db test connection
-    Company.count
-  rescue StandardError => e
-    App.migrate
-  end
-  arg = ARGV.shift
-  case arg
-  when "all_companies"
-    App.all_companies
-  when "non_responded"
-    App.non_responded
-  when "responded_non_rejected"
-    App.responded_non_rejected
-  when "events"
-    company_name = ARGV.shift
-    unless company_name.blank?
-      App.events(company_name)
-    end
-  when "scheduled"
-    App.scheduled
-  when "responses"
-    App.responses
-  when "todos"
-    App.todos
-  else
-    unless arg.blank?
-      company_name = ARGV.shift
-      unless company_name.blank?
-        App.find company_name
-      end
-    end
-  end
-when "console"
-  puts "Job Application Tracker".bold
-  puts "to see commands, type help"
-  puts "to exit, type quit"
-  while true
-    begin
-      print "> "
-      input = gets
-      next if input.nil? || input.empty?
-      args = input.chomp.split(" ")
-      method = args.shift.to_sym
-      unless App.methods(false).include?(method)
-        puts "method not found (type help to see methods)"
-        next
-      end
-      App.send(method, *args)
-      puts "ok".green
-    rescue CompanyNotFoundError => error
-      puts "company not found".yellow
-    rescue StandardError => error
-      puts error, error.backtrace
-      if error.message.scan(/table.+already\sexists/)
-        puts "Migrations have already been run.".yellow
-      elsif error.class == ActiveRecord::StatementInvalid
-        puts "Active Record error - did you run the migrations?".yellow
-      end
-      if error.class == SQLite3::SQLException
-        true
-      end
-      puts "error".red
-    end
-  end
-end
+# case ARGV.shift # needs to be shifted, otherwise it interferes with gets
+# when "server"
+#   File.open("./html/index.html")
+# when "byebug"
+#   require 'byebug'
+#   byebug
+#   true
+# when "script"
+#   begin
+#     # Db test connection
+#     Company.count
+#   rescue StandardError => e
+#     App.migrate
+#   end
+#   arg = ARGV.shift
+#   case arg
+#   when "all_companies"
+#     App.all_companies
+#   when "non_responded"
+#     App.non_responded
+#   when "responded_non_rejected"
+#     App.responded_non_rejected
+#   when "events"
+#     company_name = ARGV.shift
+#     unless company_name.blank?
+#       App.events(company_name)
+#     end
+#   when "scheduled"
+#     App.scheduled
+#   when "responses"
+#     App.responses
+#   when "todos"
+#     App.todos
+#   else
+#     unless arg.blank?
+#       company_name = ARGV.shift
+#       unless company_name.blank?
+#         App.find company_name
+#       end
+#     end
+#   end
+# when "console"
+#   puts "Job Application Tracker".bold
+#   puts "to see commands, type help"
+#   puts "to exit, type quit"
+#   while true
+#     begin
+#       print "> "
+#       input = gets
+#       next if input.nil? || input.empty?
+#       args = input.chomp.split(" ")
+#       method = args.shift.to_sym
+#       unless App.methods(false).include?(method)
+#         puts "method not found (type help to see methods)"
+#         next
+#       end
+#       App.send(method, *args)
+#       puts "ok".green
+#     rescue CompanyNotFoundError => error
+#       puts "company not found".yellow
+#     rescue StandardError => error
+#       puts error, error.backtrace
+#       if error.message.scan(/table.+already\sexists/)
+#         puts "Migrations have already been run.".yellow
+#       elsif error.class == ActiveRecord::StatementInvalid
+#         puts "Active Record error - did you run the migrations?".yellow
+#       end
+#       if error.class == SQLite3::SQLException
+#         true
+#       end
+#       puts "error".red
+#     end
+#   end
+# end

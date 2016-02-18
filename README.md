@@ -1,96 +1,31 @@
-# job_tracker_cli
+This is a ruby CLI skeleton using [ripl](https://github.com/cldwalker/ripl).
 
-CLI Job Application Tracker
-
-Tracks job applications. Written in Ruby.
-
-## To run
+How to use:
 
 1. Clone repo
+2. run `bundle install`
+3. Customize the `ruby-cli-skeleton` file.
+  - The CLI is all set up and ready to use, it just lacks commands.
+  - Some commands are already defined, like `help`, `ls`, and `pwd`.
+  - The commands available in the CLI are the instance methods
+    on the `RubyCliSkeleton` class and any class it inherits from.
+  - Commands are simple to write. You can print something, return some value
+    (this is a REPL), or just return nil.
+  - Custom commands are written in `lib/commands.rb`
+  - If renaming the class/file in `lib/commands.rb`, also change the `COMMANDS_CLASS`
+    and `COMMANDS_FILE` constants in `ruby-cli-skeleton`. Make sure the `initialize` method
+    on `COMMANDS_CLASS` accepts an options hash.
+  - `OptionParser` can be used in `ruby-cli-skeleton`, read [the docs](http://ruby-doc.org/stdlib-2.3.0/libdoc/optparse/rdoc/OptionParser.html)
+    for more info.
+  - Add a method's name to `no_help_methods` to prevent the `help` command from listing it
+4. After customizing, open the `ruby-cli-skeleton` executable to start the program
 
-2. `bundle install` (tested with Ruby 1.9.3 and 2.2.3)
-
-3. To run the cli, enter `ruby app.rb console`
-
-4. run migrations by entering `migrate` to the console
-
-- To load all the code but not run the console, require the file as usual (`require_relative './app.rb'`)
-
-- You can load the app and drop into byebug (if installed) by entering `ruby app.rb byebug`
-
-
-## Usage
-
-### Note some of these might be out date, look at app.rb
-
-To call a method from the console, enter the method's name.
-
-If a method takes arguments, append them to the method call without quotes
-
-(i.e. `add_company some_company_name`)
-
-`help`: lists available methods
-
-`readme`: print the readme
-
-`quit`: exits the program
-
-**Companies** 
-
-`add_company company_name`: creates a company record
-
-`find_company company_name`: searches for matching companies. company_name can be a partial match, i.e. `find_company sob` will match the company "Sobrr".
-
-`all_companies`: list all companies
-
-`responded_companies`: list companies which have responded
-
-`non_responded_companies`: list companies which have not responded
-
-`responded_percentage`: list percentage of companies which have responded
-
-`rejected_percentage`: list percentage of companies which have rejected
-
-`mark_rejected company_name`: mark a company as rejected
-
-`mark_responded company_name`: mark a company as responded
-
-`pending_responded_companies`: companies which have responded but not rejected
-
-
-
-**Events**
-
-`add_event company_name`: add an event record to the given company. Prompts will be subsequently presented for the "content" and "is_response" attributes. If the event is a response from the company, "is_response" should be true.
-
-`events company_name`: lists events associated with the given company
-
-`responses`: list all events which are responses from companies
-
-`scheduled_events`: list all events with :is_scheduled as true. I.e. homework (coding challenges), scheduled interviews or phone screens. 
-
-`mark_unscheduled event_id`: set :is_scheduled to false. For example, when a scheduled phone screen has already happened.
-
-**Application Counts**
-
-`last_day_applied_count`: num companies added in last 24 hours
-
-`total_applied_count`: total number of companies
-
-`responded_percentage`: percentage of companies which have responded
-
-`rejected_perecentage`: percentage of companies which have rejected
-
-**Database**
-
-`migrate`: run the migrations
-
-`remigrate`: drop tables and run migrations again
-
-## TODO
-
-- more categories for events, i.e. "phone screen" or "coding challenge"
-- Refactor app.rb into different files
-- Use many migrations instead of just one
-- Add reminder system for when to follow up with companies
-- Add web interface with CRUD forms
+What kind of helpers does this provide:
+  - The `help` command (with no arguments) will print out all the methods available to the CLI.
+    It does this using `instance_methods(false)` on `RubyCliSkeleton` and `COMMANDS_CLASS`, so
+    once a method is defined, it will be included here (unless it's included in `no_help_methods`)
+  - The `help` command (when given a method name as an argument) will print out the
+    source code for the method. It does this using the [method_source](https://github.com/banister/method_source) gem
+  - [awesome_print](https://github.com/michaeldv/awesome_print/) and [colored](https://github.com/defunkt/colored) are installed for pretty printing / colors.
+  - Some ripl plugins are installed. `ripl-shell_commands` enables any shell method to be run in the CLI by prepending a bang ("!").
+    For example, `!echo true` will print `true`.

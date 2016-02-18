@@ -2,8 +2,6 @@
 
 I've recently changed the CLI interface to this to use my [ruby-cli-skeleton](http://github.com/maxpleaner/ruby-cli-skeleton).
 
-I haven't properly redone the README yet, though.
-
 To run this, `clone`, `bundle`, then run the `job_tracker_cli` executable, which starts
 a ruby REPL. You can type `help` to see commands.
 

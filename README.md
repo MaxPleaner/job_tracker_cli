@@ -10,7 +10,7 @@ Some useful commands:
 - `remigrate` _deletes everything_
 - `add_company(name)`
 - `add_event(company_name)`
-- `find(company_name_to_search)`
+- `find(fragment_of_company_name)`
 - `all_companies`
 - `backup` - writes to backup.yml
 - `read_backup` prints the backup file

@@ -12,7 +12,8 @@ Some useful commands:
 - `add_event(company_name)`
 - `find(fragment_of_company_name)`
 - `all_companies`
-- `backup` - writes to backup.yml
+- `backup(verbose=false)` - writes to backup.yml.
+   Pass a `true` argument to make a backup that can be re-imported.  
 - `read_backup` prints the backup file
 - `import_backup` from backup.yml
 

@@ -15,7 +15,7 @@ Some useful commands:
 - `backup(verbose=false)` - writes to backup.yml.
    Pass a `true` argument to make a backup that can be re-imported.  
 - `read_backup` prints the backup file
-- `import_backup` from backup.yml
+- `import_backup` from backup.yml, if a verbose export was made
 
 The source for these commands is `job_tracker_api.rb`, where the CLI
 base is in `job_tracker_cli`.

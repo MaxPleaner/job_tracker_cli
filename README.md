@@ -1,3 +1,10 @@
+# Deprecation
+
+#### This project is pretty much made redundant by [jobapps](http://github.com/maxpleaner/jobapps).
+
+---
+
+
 ## Job tracker cli
 
 I've recently changed the CLI interface to this to use my [ruby-cli-skeleton](http://github.com/maxpleaner/ruby-cli-skeleton).
